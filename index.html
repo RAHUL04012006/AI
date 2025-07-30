@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant - Free AI Models</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Puter.js - FREE AI Access -->
+    <script src="https://js.puter.com/v2/"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                'chat-dark': '#0f0f23',
+                'chat-darker': '#0a0a15',
+                'chat-light': '#1a1a2e',
+                'chat-border': '#2d2d44',
+                'chat-accent': '#4f46e5',
+                'chat-accent-hover': '#4338ca',
+                'chat-turquoise': '#20b2aa',
+                'chat-turquoise-dark': '#1a9999'
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-chat-darker text-white">
+    <!-- Header -->
+    <header class="bg-chat-dark border-b border-chat-border sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-chat-turquoise to-chat-accent rounded-lg flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-white">AI Chat Assistant</h1>
+                        <p class="text-xs text-gray-400">Free AI models powered by Puter.js</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="auth-btn" class="hidden bg-chat-accent hover:bg-chat-accent-hover text-white px-3 py-1 rounded text-sm transition-colors">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Sign In
+                    </button>
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-400 hover:text-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">Free AI Chat</div>
+                        <div id="auth-status" class="text-xs text-green-400">● Online</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container flex h-screen pt-16">
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+        
+        <!-- Left Sidebar -->
+        <div id="sidebar" class="w-64 bg-chat-dark border-r border-chat-border flex flex-col">
+            <!-- Model Selection -->
+            <div class="p-6 border-b border-chat-border">
+                <h2 class="text-lg font-semibold mb-4">AI Model</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Select Model</label>
+                        <select id="model-selector" class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-chat-accent focus:border-transparent">
+                            <optgroup label="OpenAI">
+                                <option value="gpt-4o">GPT-4o (Vision + Audio)</option>
+                                <option value="gpt-4.1">GPT-4.1 (Advanced)</option>
+                                <option value="o1">o1 (Reasoning)</option>
+                                <option value="o3-mini">o3-mini (Fast)</option>
+                            </optgroup>
+                            <optgroup label="Anthropic">
+                                <option value="claude-sonnet-4" selected>Claude Sonnet 4 (Recommended)</option>
+                            </optgroup>
+                            <optgroup label="DeepSeek">
+                                <option value="deepseek-chat">DeepSeek Chat V3</option>
+                                <option value="deepseek-reasoner">DeepSeek Reasoner R1</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <!-- Model Info -->
+                    <div class="bg-chat-darker rounded-lg p-3 text-xs">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-gray-400">Current:</span>
+                            <span id="current-model" class="text-chat-turquoise font-medium">Claude Sonnet 4</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-gray-400">Provider:</span>
+                            <span id="model-provider" class="text-white">Anthropic</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400">Features:</span>
+                            <span id="model-capabilities" class="text-white">Text, Code, Analysis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- File Upload -->
+            <div class="p-6 border-b border-chat-border">
+                <h3 class="text-lg font-semibold mb-4">File Upload</h3>
+                
+                <div id="file-drop-zone" class="border-2 border-dashed border-chat-border rounded-lg p-4 text-center cursor-pointer hover:border-chat-accent transition-colors">
+                    <div id="drop-content">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-400">Drop files here or click to upload</p>
+                        <p class="text-xs text-gray-500 mt-1">Supports images, text files, and documents</p>
+                    </div>
+                    
+                    <div id="upload-progress" class="hidden">
+                        <i class="fas fa-spinner fa-spin text-chat-accent text-2xl mb-2"></i>
+                        <p class="text-sm text-chat-accent">Processing files...</p>
+                    </div>
+                </div>
+                
+                <input type="file" id="file-input" multiple accept="*/*" class="hidden">
+                
+                <!-- Uploaded Files -->
+                <div id="uploaded-files" class="mt-4 space-y-2 max-h-32 overflow-y-auto"></div>
+            </div>
+            
+            <!-- Image Generation -->
+            <div class="p-6 border-b border-chat-border">
+                <h3 class="text-lg font-semibold mb-4">Image Generation</h3>
+                
+                <div class="space-y-3">
+                    <textarea id="image-prompt" 
+                              placeholder="Describe an image to generate..."
+                              class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 resize-none h-20 text-sm focus:ring-2 focus:ring-chat-accent focus:border-transparent placeholder-gray-500"></textarea>
+                    
+                    <button id="generate-image-btn" class="w-full bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white py-2 rounded-md transition-all duration-200 font-medium text-sm">
+                        <i class="fas fa-image mr-2"></i>Generate Image
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Chat Stats -->
+            <div class="flex-1 p-6">
+                <h3 class="text-lg font-semibold mb-4">Session Stats</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Messages:</span>
+                        <span id="message-count" class="text-white">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Files uploaded:</span>
+                        <span id="file-count" class="text-white">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Images generated:</span>
+                        <span id="image-count" class="text-white">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col bg-chat-darker relative">
+            <!-- Chat Messages -->
+            <div class="flex-1 overflow-y-auto p-4 pb-32" id="chat-container">
+                <div id="messages-container" class="max-w-4xl mx-auto space-y-4">
+                    <!-- Welcome Message -->
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gradient-to-r from-chat-turquoise to-chat-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-robot text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Welcome to AI Chat Assistant</h2>
+                        <p class="text-gray-400 mb-6">Chat with advanced AI models, upload files, and generate images - all for free!</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-2xl mx-auto text-sm">
+                            <div class="bg-chat-light rounded-lg p-4">
+                                <i class="fas fa-comments text-chat-turquoise text-lg mb-2"></i>
+                                <div class="text-white font-medium">Smart Conversations</div>
+                                <div class="text-gray-400 text-xs">Context-aware AI chat</div>
+                            </div>
+                            <div class="bg-chat-light rounded-lg p-4">
+                                <i class="fas fa-file-upload text-chat-turquoise text-lg mb-2"></i>
+                                <div class="text-white font-medium">File Analysis</div>
+                                <div class="text-gray-400 text-xs">Upload and analyze files</div>
+                            </div>
+                            <div class="bg-chat-light rounded-lg p-4">
+                                <i class="fas fa-image text-chat-turquoise text-lg mb-2"></i>
+                                <div class="text-white font-medium">Image Generation</div>
+                                <div class="text-gray-400 text-xs">Create AI-generated images</div>
+                            </div>
+                            <div class="bg-chat-light rounded-lg p-4">
+                                <i class="fas fa-brain text-chat-turquoise text-lg mb-2"></i>
+                                <div class="text-white font-medium">Multiple Models</div>
+                                <div class="text-gray-400 text-xs">Choose from various AI models</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="absolute bottom-0 left-0 right-0 border-t border-chat-border bg-chat-dark p-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-end space-x-3">
+                        <div class="flex-1">
+                            <textarea id="message-input" 
+                                      placeholder="Type your message... (Shift+Enter for new line)"
+                                      class="w-full bg-chat-darker text-white border border-chat-border rounded-lg px-4 py-3 resize-none focus:ring-2 focus:ring-chat-accent focus:border-transparent placeholder-gray-400"
+                                      rows="1"
+                                      style="max-height: 128px;"></textarea>
+                        </div>
+                        <button id="send-btn" class="bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white p-3 rounded-lg transition-all duration-200 font-medium">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    
+
+                    
+                    <!-- Typing Indicator -->
+                    <div id="typing-indicator" class="hidden mt-2 text-sm text-gray-400">
+                        <i class="fas fa-circle-notch fa-spin mr-2"></i>AI is thinking...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-chat-dark border-t border-chat-border py-3 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="text-gray-400 text-xs">
+                Created by <span class="text-chat-turquoise font-medium">Rahul-AlgoCroc</span> | 
+                Powered by <a href="https://puter.com" class="text-chat-accent hover:text-chat-accent-hover">Puter.js</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Image Gallery Modal -->
+    <div id="image-gallery-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-chat-dark rounded-lg p-6 max-w-4xl max-h-4xl w-full mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-white">Generated Images</h3>
+                <button id="close-gallery-btn" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="gallery-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                <!-- Images will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-chat-dark rounded-lg p-6 flex items-center space-x-4">
+            <i class="fas fa-spinner fa-spin text-chat-accent text-2xl"></i>
+            <div>
+                <div class="text-white font-medium">Processing...</div>
+                <div id="loading-message" class="text-gray-400 text-sm">Please wait</div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Scripts -->
+    <script src="js/puter-integration.js"></script>
+    <script src="js/chat-app.js"></script>
+</body>
+</html>
