@@ -43,7 +43,8 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 bg-gradient-to-r from-chat-turquoise to-chat-accent rounded-lg flex items-center justify-center">
-                        <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-6 h-6 object-contain" />
+                        <!-- Logo: Only this changed -->
+                        <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-8 h-8 rounded-full object-cover border-2 border-white shadow" />
                     </div>
                     <div>
                         <h1 class="text-lg font-semibold text-white">AI Chat Assistant</h1>
@@ -81,7 +82,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Select Model</label>
-                        <select id="model-selector" class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-chat-accent focus:border-transparent">
+                        <select id="model-selector" class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-chat-accent focus:border-tran[...]
                             <optgroup label="OpenAI">
                                 <option value="gpt-4o">GPT-4o (Vision + Audio)</option>
                                 <option value="gpt-4.1">GPT-4.1 (Advanced)</option>
@@ -146,9 +147,9 @@
                 <div class="space-y-3">
                     <textarea id="image-prompt" 
                               placeholder="Describe an image to generate..."
-                              class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 resize-none h-20 text-sm focus:ring-2 focus:ring-chat-accent focus:border-transparent placeholder-gray-500"></textarea>
+                              class="w-full bg-chat-darker text-white border border-chat-border rounded-md px-3 py-2 resize-none h-20 text-sm focus:ring-2 focus:ring-chat-accent focus:border-transpare[...]
                     
-                    <button id="generate-image-btn" class="w-full bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white py-2 rounded-md transition-all duration-200 font-medium text-sm">
+                    <button id="generate-image-btn" class="w-full bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white py-2 rounded-[...]
                         <i class="fas fa-image mr-2"></i>Generate Image
                     </button>
                 </div>
@@ -182,7 +183,8 @@
                     <!-- Welcome Message -->
                     <div class="text-center py-8">
                         <div class="w-16 h-16 bg-gradient-to-r from-chat-turquoise to-chat-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                            <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-6 h-6 object-contain" />
+                            <!-- Logo: Only this changed -->
+                            <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow" />
                         </div>
                         <h2 class="text-2xl font-bold text-white mb-2">Welcome to AI Chat Assistant</h2>
                         <p class="text-gray-400 mb-6">Chat with advanced AI models, upload files, and generate images - all for free!</p>
@@ -220,11 +222,11 @@
                         <div class="flex-1">
                             <textarea id="message-input" 
                                       placeholder="Type your message... (Shift+Enter for new line)"
-                                      class="w-full bg-chat-darker text-white border border-chat-border rounded-lg px-4 py-3 resize-none focus:ring-2 focus:ring-chat-accent focus:border-transparent placeholder-gray-400"
+                                      class="w-full bg-chat-darker text-white border border-chat-border rounded-lg px-4 py-3 resize-none focus:ring-2 focus:ring-chat-accent focus:border-transparent pl[...]
                                       rows="1"
                                       style="max-height: 128px;"></textarea>
                         </div>
-                        <button id="send-btn" class="bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white p-3 rounded-lg transition-all duration-200 font-medium">
+                        <button id="send-btn" class="bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white p-3 rounded-lg transition-[...]
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
