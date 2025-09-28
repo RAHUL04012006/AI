@@ -1,112 +1,165 @@
-/**
- * OpenRouter API Integration Module
- * Handles DeepSeek V3.1 and other OpenRouter models as fallback
- */
 
 class OpenRouterIntegration {
     constructor() {
         this.apiKey = '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';
         this.baseUrl = 'https://openrouter.ai/api/v1';
-        this.currentModel = 'deepseek/deepseek-chat';
+        this.currentModel = 'deepseek/deepseek-chat-v3.1:free';
         
-        // Available OpenRouter models
-        this.models = {
-            'deepseek/deepseek-chat': {
-                name: 'DeepSeek V3.1 (Free)',
+        // Free models available on OpenRouter (based on actual available models)
+        this.freeModels = {
+            'deepseek/deepseek-chat-v3.1:free': {
+                name: 'DeepSeek: DeepSeek V3.1 (Free)',
                 provider: 'DeepSeek',
-                capabilities: 'Text, Code, Math, Reasoning',
-                free: true,
-                streaming: true
+                capabilities: 'Text, Code, Math',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
             },
-            'deepseek/deepseek-reasoner': {
-                name: 'DeepSeek R1 (Free)',
+            'nousresearch/deephermes-3-llama-3-8b-preview:free': {
+                name: 'Nous: DeepHermes 3 Llama 3 8B Preview (Free)',
+                provider: 'Nous Research',
+                capabilities: 'Text, Code, Chat',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
+            },
+            'deepseek/deepseek-r1-0528-qwen3-8b:free': {
+                name: 'DeepSeek: DeepSeek R1 0528 Qwen3 8B (Free)',
                 provider: 'DeepSeek',
-                capabilities: 'Advanced Reasoning, Logic',
-                free: true,
-                streaming: true
+                capabilities: 'Reasoning, Text, Code',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
             },
-            'google/gemini-flash-1.5': {
-                name: 'Gemini Flash 1.5',
-                provider: 'Google',
-                capabilities: 'Text, Vision, Fast Response',
-                free: true,
-                streaming: true
+            'deepseek/deepseek-r1-0528:free': {
+                name: 'DeepSeek: R1 0528 (Free)',
+                provider: 'DeepSeek',
+                capabilities: 'Advanced Reasoning',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
             },
-            'meta-llama/llama-3.1-8b-instruct:free': {
-                name: 'Llama 3.1 8B (Free)',
-                provider: 'Meta',
-                capabilities: 'Text, Code, General',
-                free: true,
-                streaming: true
+            'deepseek/deepseek-chat-v3-0324:free': {
+                name: 'DeepSeek: DeepSeek V3 0324 (Free)',
+                provider: 'DeepSeek',
+                capabilities: 'Text, Code, Analysis',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
+            },
+            'deepseek/deepseek-r1-distill-llama-70b:free': {
+                name: 'DeepSeek: R1 Distill Llama 70B (Free)',
+                provider: 'DeepSeek',
+                capabilities: 'Reasoning, Code',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
+            },
+            'deepseek/deepseek-r1:free': {
+                name: 'DeepSeek: R1 (Free)',
+                provider: 'DeepSeek',
+                capabilities: 'Reasoning, Analysis',
+                multimodal: false,
+                streaming: true,
+                requiresAuth: false
             }
         };
         
-        this.isAvailable = true;
-        console.log('🔄 OpenRouter Integration initialized');
+        this.lastResponse = '';
     }
     
-    getModelConfig(modelId) {
-        return this.models[modelId] || this.models['deepseek/deepseek-chat'];
-    }
-    
-    getAllModels() {
-        return this.models;
-    }
-    
-    setCurrentModel(modelId) {
-        if (this.models[modelId]) {
-            this.currentModel = modelId;
-            console.log(`🤖 OpenRouter switched to: ${this.models[modelId].name}`);
+    setCurrentModel(model) {
+        if (this.freeModels[model]) {
+            this.currentModel = model;
+            console.log(`🤖 Switched to OpenRouter model: ${model}`);
             return true;
         }
         return false;
     }
     
-    async sendMessage(message, chatHistory = []) {
+    getModelConfig(model) {
+        return this.freeModels[model] || this.freeModels['deepseek/deepseek-chat-v3.1:free'];
+    }
+    
+    getFreeModels() {
+        return this.freeModels;
+    }
+    
+    getAvailableModelNames() {
+        return Object.keys(this.freeModels);
+    }
+    
+    async sendMessage(message, attachments = [], chatHistory = []) {
         try {
-            console.log(`🚀 Sending message to OpenRouter (${this.models[this.currentModel].name})`);
+            const config = this.getModelConfig(this.currentModel);
             
-            // Prepare messages array for OpenRouter API
-            const messages = [];
+            // Prepare message with context
+            let messageInput = message;
             
-            // Add system message for DeepSeek models
-            if (this.currentModel.includes('deepseek')) {
-                messages.push({
-                    role: 'system',
-                    content: 'You are a helpful AI assistant powered by DeepSeek. You excel at coding, mathematics, reasoning, and providing detailed explanations. Always be helpful, accurate, and concise.'
-                });
+            // Include file contents in the message if available
+            if (attachments.length > 0) {
+                let fileContext = "\n\nAttached files:\n";
+                
+                for (const file of attachments) {
+                    if (file.content) {
+                        fileContext += `\n--- ${file.name} ---\n${file.content}\n`;
+                    } else if (file.type.startsWith('image/')) {
+                        fileContext += `\n- Image: ${file.name} (${file.type}) - Note: Image analysis not available with this model\n`;
+                    } else {
+                        fileContext += `\n- File: ${file.name} (${file.type}, ${file.size} bytes)\n`;
+                    }
+                }
+                
             }
             
-            // Add chat history (last 10 messages for context)
-            const recentHistory = chatHistory.slice(-10);
-            for (const msg of recentHistory) {
-                if (msg.type === 'user') {
-                    messages.push({
-                        role: 'user',
-                        content: msg.content
-                    });
-                } else if (msg.type === 'ai') {
-                    messages.push({
-                        role: 'assistant',
-                        content: msg.content
-                    });
+            // Build conversation context
+            const messages = [];
+            
+            // Add system message
+            messages.push({
+                role: 'system',
+                content: 'You are a helpful AI assistant. Provide clear, accurate, and helpful responses. Be concise but thorough.'
+            });
+            
+            // Add chat history (last 10 messages)
+            if (chatHistory.length > 0) {
+                const recentHistory = chatHistory.slice(-10);
+                for (const msg of recentHistory) {
+                    if (msg.type === 'user') {
+                        messages.push({
+                            role: 'user',
+                            content: msg.content
+                        });
+                    } else if (msg.type === 'ai') {
+                        messages.push({
+                            role: 'assistant',
+                            content: msg.content
+                        });
+                    }
                 }
             }
             
             // Add current message
             messages.push({
                 role: 'user',
-                content: message
+                content: messageInput
             });
             
-            const requestBody = {
-                model: this.currentModel,
-                messages: messages,
-                stream: this.models[this.currentModel].streaming,
-                temperature: 0.7,
-                max_tokens: 4000
-            };
+            // Make API request
+            if (config.streaming) {
+                return await this.streamMessage(messages);
+            } else {
+                return await this.sendNonStreamingMessage(messages);
+            }
             
+        } catch (error) {
+            console.error('❌ OpenRouter API error:', error);
+            throw new Error(`OpenRouter API failed: ${error.message}`);
+        }
+    }
+    
+    async streamMessage(messages) {
+        try {
             const response = await fetch(`${this.baseUrl}/chat/completions`, {
                 method: 'POST',
                 headers: {
@@ -115,41 +168,31 @@ class OpenRouterIntegration {
                     'HTTP-Referer': window.location.origin,
                     'X-Title': 'AlgoCroc AI'
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    model: this.currentModel,
+                    messages: messages,
+                    stream: true,
+                    temperature: 0.7,
+                    max_tokens: 2000,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0
+                })
             });
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(`OpenRouter API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+                throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
             }
             
-            if (this.models[this.currentModel].streaming) {
-                return {
-                    type: 'stream',
-                    stream: this.createStreamReader(response)
-                };
-            } else {
-                const data = await response.json();
-                const content = data.choices?.[0]?.message?.content || 'No response received';
-                return {
-                    type: 'complete',
-                    content: content
-                };
-            }
+            return {
+                type: 'stream',
+                stream: this.createStreamReader(response)
+            };
             
         } catch (error) {
-            console.error('❌ OpenRouter API error:', error);
-            
-            // Handle specific errors
-            if (error.message.includes('401')) {
-                throw new Error('OpenRouter API key is invalid or expired. Please check your API key.');
-            } else if (error.message.includes('429')) {
-                throw new Error('OpenRouter rate limit exceeded. Please wait a moment and try again.');
-            } else if (error.message.includes('insufficient_quota')) {
-                throw new Error('OpenRouter quota exceeded. The free tier has usage limits.');
-            }
-            
-            throw new Error(`OpenRouter error: ${error.message}`);
+            console.error('❌ OpenRouter streaming error:', error);
+            throw error;
         }
     }
     
@@ -169,9 +212,8 @@ class OpenRouterIntegration {
                 buffer = lines.pop() || '';
                 
                 for (const line of lines) {
-                    const trimmed = line.trim();
-                    if (trimmed.startsWith('data: ')) {
-                        const data = trimmed.slice(6);
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
                         
                         if (data === '[DONE]') {
                             return;
@@ -185,7 +227,8 @@ class OpenRouterIntegration {
                                 yield { text: content };
                             }
                         } catch (parseError) {
-                            console.warn('Failed to parse SSE data:', data);
+                            // Skip invalid JSON
+                            continue;
                         }
                     }
                 }
@@ -195,30 +238,57 @@ class OpenRouterIntegration {
         }
     }
     
-    async testConnection() {
+    async sendNonStreamingMessage(messages) {
         try {
-            const response = await fetch(`${this.baseUrl}/models`, {
+            const response = await fetch(`${this.baseUrl}/chat/completions`, {
+                method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.apiKey}`,
-                    'HTTP-Referer': window.location.origin
-                }
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'AlgoCroc AI'
+                },
+                body: JSON.stringify({
+                    model: this.currentModel,
+                    messages: messages,
+                    stream: false,
+                    temperature: 0.7,
+                    max_tokens: 2000,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0
+                })
             });
             
-            return response.ok;
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            const content = data.choices?.[0]?.message?.content || 'No response received';
+            
+            this.lastResponse = content;
+            
+            return {
+                type: 'complete',
+                content: content
+            };
+            
         } catch (error) {
-            console.error('OpenRouter connection test failed:', error);
-            return false;
+            console.error('❌ OpenRouter non-streaming error:', error);
+            throw error;
         }
     }
     
-    isModelAvailable(modelId) {
-        return this.models.hasOwnProperty(modelId);
+    async generateImage(prompt) {
+        // OpenRouter doesn't provide free image generation
+        throw new Error('Image generation is not available with free OpenRouter models. Please use Puter.js for image generation.');
     }
     
-    getFreeModels() {
-        return Object.entries(this.models)
-            .filter(([_, config]) => config.free)
-            .map(([id, config]) => ({ id, ...config }));
+    async analyzeImage(imageFile, prompt) {
+        // Most free models don't support vision
+        throw new Error('Image analysis is not available with free OpenRouter models. Please use Puter.js vision models for image analysis.');
     }
 }
 
