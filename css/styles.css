@@ -1,6 +1,3 @@
-/* Custom CSS for enhanced styling */
-
-/* Layout Structure */
 body {
     display: flex;
     flex-direction: column;
@@ -233,7 +230,9 @@ code.inline-code {
         height: 100vh;
         z-index: 50;
         transition: left 0.3s ease;
-        width: 320px;
+        width: 85vw;
+        max-width: 320px;
+        overflow-y: auto;
     }
     
     #sidebar.sidebar-open {
@@ -243,7 +242,8 @@ code.inline-code {
     .sidebar-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
         z-index: 40;
         opacity: 0;
         pointer-events: none;
@@ -253,6 +253,68 @@ code.inline-code {
     .sidebar-overlay.active {
         opacity: 1;
         pointer-events: auto;
+    }
+    
+    /* Mobile Chat Input */
+    .chat-input-mobile {
+        bottom: 1rem !important;
+        left: 1rem !important;
+        right: 1rem !important;
+    }
+    
+    /* Mobile Header */
+    header {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Mobile Welcome Message */
+    .welcome-message {
+        padding: 2rem 1rem;
+        text-align: center;
+    }
+    
+    .welcome-message h1 {
+        font-size: 1.75rem;
+    }
+    
+    .welcome-message p {
+        font-size: 0.875rem;
+    }
+    
+    /* Mobile Feature Cards */
+    .feature-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+    
+    /* Mobile Chat Container */
+    #chat-container {
+        padding-bottom: 250px;
+    }
+    
+    /* Mobile Message Styling */
+    .message-content {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    /* Mobile Code Blocks */
+    .code-block-container pre {
+        font-size: 12px;
+        padding: 12px;
+    }
+    
+    /* Mobile Input Styling */
+    #message-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        min-height: 48px;
+    }
+    
+    /* Mobile Button Sizing */
+    #send-btn {
+        min-width: 48px;
+        min-height: 48px;
     }
 }
 
@@ -369,6 +431,7 @@ footer {
 /* Chat Container Styling */
 #chat-container {
     background: linear-gradient(180deg, #0a0a15 0%, #0f0f23 100%);
+    padding-bottom: 200px;
 }
 
 /* Image Modal Enhancement */
