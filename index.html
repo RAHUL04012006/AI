@@ -73,32 +73,51 @@
 </head>
 <body class="min-h-screen bg-chat-darker text-white">
     <!-- Header -->
-    <header class="bg-chat-dark/95 backdrop-blur-md border-b border-chat-border sticky top-0 z-40 animate-slide-down">
+    <header class="bg-gradient-to-r from-chat-dark/95 via-chat-darker/95 to-chat-dark/95 backdrop-blur-md border-b border-chat-border/50 sticky top-0 z-40 animate-slide-down shadow-xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3 animate-fade-in">
-                    <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-chat-turquoise/30 hover:ring-chat-turquoise/60 transition-all duration-300 hover:scale-110">
-                        <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-full h-full object-cover" />
+            <div class="flex items-center justify-between h-18">
+                <div class="flex items-center space-x-4 animate-fade-in">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-chat-turquoise/30 hover:ring-chat-turquoise/60 transition-all duration-300 hover:scale-110 shadow-lg bg-white/10 backdrop-blur-sm">
+                            <img src="AlgoCroc.png" alt="AlgoCroc Logo" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse-glow"></div>
                     </div>
                     <div>
-                        <h1 class="text-lg font-semibold text-white bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">AlgoCroc AI</h1>
-                        <p class="text-xs text-gray-400 hover:text-gray-300 transition-colors">Free AI models powered by Puter.js</p>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-white via-chat-turquoise to-chat-accent bg-clip-text text-transparent">AlgoCroc AI</h1>
+                        <p class="text-xs text-gray-400 font-medium hover:text-gray-300 transition-colors">Free AI Models • No Limits • No Signup</p>
+                    </div>
+                    
+                    <!-- Status & Model Info -->
+                    <div class="hidden lg:flex items-center space-x-3 ml-6">
+                        <div class="flex items-center space-x-2 bg-chat-light/50 backdrop-blur-sm px-3 py-2 rounded-full border border-chat-border/30">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse-glow"></div>
+                            <span id="auth-status" class="text-xs text-green-400 font-medium">Online</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-chat-turquoise/10 backdrop-blur-sm px-3 py-2 rounded-full border border-chat-turquoise/30">
+                            <i class="fas fa-brain text-chat-turquoise text-xs"></i>
+                            <span id="current-model-header" class="text-xs text-chat-turquoise font-medium">DeepSeek V3.1</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="flex items-center space-x-4 animate-fade-in">
-                    <button id="auth-btn" class="hidden bg-gradient-to-r from-chat-accent to-chat-accent-hover hover:from-chat-accent-hover hover:to-chat-accent text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                <div class="flex items-center space-x-3 animate-fade-in">
+                    <!-- Provider Toggle -->
+                    <div class="hidden md:flex items-center space-x-2 bg-chat-light/50 backdrop-blur-sm px-3 py-2 rounded-full border border-chat-border/30">
+                        <span class="text-xs text-gray-400">Provider:</span>
+                        <select id="provider-selector" class="bg-transparent text-chat-turquoise text-xs font-medium border-none outline-none cursor-pointer">
+                            <option value="openrouter" class="bg-chat-dark">OpenRouter (Free)</option>
+                            <option value="puter" class="bg-chat-dark">Puter.js</option>
+                        </select>
+                    </div>
+                    
+                    <button id="auth-btn" class="hidden bg-gradient-to-r from-chat-accent to-chat-accent-hover hover:from-chat-accent-hover hover:to-chat-accent text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
                         <i class="fas fa-sign-in-alt mr-2"></i>Sign In
                     </button>
-                    <button id="mobile-menu-btn" class="md:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-chat-light transition-all duration-200">
-                        <i class="fas fa-bars"></i>
+                    
+                    <button id="mobile-menu-btn" class="md:hidden bg-gradient-to-r from-chat-light to-chat-border text-white p-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
+                        <i class="fas fa-bars text-lg"></i>
                     </button>
-                    <div class="text-right">
-                        <div class="text-xs text-gray-400">Free AI Chat</div>
-                        <div id="auth-status" class="text-xs text-green-400 flex items-center">
-                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>Online
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -110,25 +129,39 @@
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
         
         <!-- Left Sidebar -->
-        <div id="sidebar" class="w-64 bg-chat-dark/95 backdrop-blur-md border-r border-chat-border flex flex-col animate-slide-up">
-            <!-- Model Selection -->
+        <div id="sidebar" class="w-64 md:w-72 lg:w-80 bg-chat-dark/95 backdrop-blur-md border-r border-chat-border flex flex-col animate-slide-up">
+            <!-- Provider & Model Selection -->
             <div class="p-6 border-b border-chat-border/50 animate-fade-in">
-                <h2 class="text-lg font-semibold mb-4 bg-gradient-to-r from-chat-turquoise to-chat-accent bg-clip-text text-transparent">AI Model</h2>
+                <h2 class="text-lg font-semibold mb-4 bg-gradient-to-r from-chat-turquoise to-chat-accent bg-clip-text text-transparent">AI Provider</h2>
                 
                 <div class="space-y-4">
+                    <!-- Provider Selection -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Select Model</label>
-                        <select id="model-selector" class="w-full bg-chat-darker/80 backdrop-blur-sm text-white border border-chat-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-chat-accent focus:border-chat-accent transition-all duration-300 hover:border-chat-turquoise/50 animate-pulse-glow">
-                            <optgroup label="OpenAI">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Provider</label>
+                        <select id="provider-selector-sidebar" class="w-full bg-chat-darker/80 backdrop-blur-sm text-white border border-chat-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-chat-turquoise focus:border-chat-turquoise transition-all duration-300 hover:border-chat-turquoise/50">
+                            <option value="openrouter">🚀 OpenRouter (Free, No Signup)</option>
+                            <option value="puter">🔐 Puter.js (Requires Login)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Model Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">AI Model</label>
+                        <select id="model-selector" class="w-full bg-chat-darker/80 backdrop-blur-sm text-white border border-chat-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-chat-accent focus:border-chat-accent transition-all duration-300 hover:border-chat-turquoise/50">
+                            <!-- OpenRouter Models (Default) -->
+                            <optgroup label="🚀 OpenRouter - Free Models" id="openrouter-models">
+                                <option value="deepseek/deepseek-chat" selected>DeepSeek V3.1 (Free) ⭐</option>
+                                <option value="deepseek/deepseek-reasoner">DeepSeek R1 (Free)</option>
+                                <option value="google/gemini-flash-1.5">Gemini Flash 1.5 (Free)</option>
+                                <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</option>
+                            </optgroup>
+                            <!-- Puter.js Models -->
+                            <optgroup label="🔐 Puter.js - Premium Models" id="puter-models" style="display: none;">
                                 <option value="gpt-4o">GPT-4o (Vision + Audio)</option>
                                 <option value="gpt-4.1">GPT-4.1 (Advanced)</option>
                                 <option value="o1">o1 (Reasoning)</option>
                                 <option value="o3-mini">o3-mini (Fast)</option>
-                            </optgroup>
-                            <optgroup label="Anthropic">
-                                <option value="claude-sonnet-4" selected>Claude Sonnet 4 (Recommended)</option>
-                            </optgroup>
-                            <optgroup label="DeepSeek">
+                                <option value="claude-sonnet-4">Claude Sonnet 4</option>
                                 <option value="deepseek-chat">DeepSeek Chat V3</option>
                                 <option value="deepseek-reasoner">DeepSeek Reasoner R1</option>
                             </optgroup>
@@ -139,15 +172,22 @@
                     <div class="bg-gradient-to-br from-chat-darker/80 to-chat-light/30 backdrop-blur-sm rounded-xl p-4 text-xs border border-chat-border/30 hover:border-chat-turquoise/30 transition-all duration-300 animate-scale-in">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-400">Current:</span>
-                            <span id="current-model" class="text-chat-turquoise font-medium bg-chat-turquoise/10 px-2 py-1 rounded-full">Claude Sonnet 4</span>
+                            <span id="current-model" class="text-chat-turquoise font-medium bg-chat-turquoise/10 px-2 py-1 rounded-full">DeepSeek V3.1</span>
                         </div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-400">Provider:</span>
-                            <span id="model-provider" class="text-white font-medium">Anthropic</span>
+                            <span id="model-provider" class="text-white font-medium">OpenRouter</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-400">Features:</span>
+                            <span id="model-capabilities" class="text-white font-medium">Text, Code, Math, Reasoning</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Features:</span>
-                            <span id="model-capabilities" class="text-white font-medium">Text, Code, Analysis</span>
+                            <span class="text-gray-400">Status:</span>
+                            <span id="model-status" class="text-green-400 font-medium flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse-glow"></div>
+                                Free & Ready
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -251,28 +291,74 @@
             </div>
             
             <!-- Chat Input -->
-            <div class="absolute bottom-0 left-0 right-0 border-t border-chat-border/50 bg-chat-dark/95 backdrop-blur-md p-6 animate-slide-up">
+            <div class="absolute bottom-4 left-4 right-4 animate-slide-up">
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex items-end space-x-4">
-                        <div class="flex-1">
-                            <textarea id="message-input" 
-                                      placeholder="Type your message... (Shift+Enter for new line)"
-                                      class="w-full bg-chat-darker/80 backdrop-blur-sm text-white border border-chat-border/50 rounded-xl px-6 py-4 resize-none focus:ring-2 focus:ring-chat-accent focus:border-chat-accent transition-all duration-300 placeholder-gray-400 hover:border-chat-turquoise/50 shadow-lg"
-                                      rows="1"
-                                      style="max-height: 128px;"></textarea>
+                    <!-- Enhanced Input Container -->
+                    <div class="bg-gradient-to-r from-chat-dark/95 via-chat-darker/95 to-chat-dark/95 backdrop-blur-md border border-chat-border/50 rounded-2xl p-4 shadow-2xl ring-1 ring-chat-turquoise/20 hover:ring-chat-turquoise/40 transition-all duration-300">
+                        <div class="flex items-end space-x-4">
+                            <div class="flex-1 relative">
+                                <!-- Input Label -->
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-gray-400 font-medium">Message</span>
+                                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                        <span>Shift+Enter for new line</span>
+                                        <i class="fas fa-keyboard text-chat-turquoise/60"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Enhanced Textarea -->
+                                <textarea id="message-input" 
+                                          placeholder="Ask me anything... I'm powered by DeepSeek V3.1 🚀"
+                                          class="w-full bg-chat-darker/60 backdrop-blur-sm text-white border-2 border-chat-border/30 rounded-xl px-6 py-4 pr-20 resize-none focus:ring-2 focus:ring-chat-turquoise focus:border-chat-turquoise transition-all duration-300 placeholder-gray-400 hover:border-chat-turquoise/50 shadow-inner text-base leading-relaxed"
+                                          rows="1"
+                                          style="max-height: 128px; min-height: 56px;"></textarea>
+                                
+                                <!-- Character Counter -->
+                                <div class="absolute bottom-3 right-4 text-xs text-gray-500 bg-chat-darker/80 px-2 py-1 rounded backdrop-blur-sm">
+                                    <span id="char-counter">0</span>/4000
+                                </div>
+                            </div>
+                            
+                            <!-- Enhanced Send Button -->
+                            <button id="send-btn" class="bg-gradient-to-r from-chat-turquoise via-chat-accent to-purple-500 hover:from-chat-turquoise-dark hover:via-chat-accent-hover hover:to-purple-600 text-white p-4 rounded-xl transition-all duration-300 font-medium transform hover:scale-105 hover:shadow-2xl group relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <i class="fas fa-paper-plane group-hover:animate-bounce-gentle relative z-10 text-lg"></i>
+                            </button>
                         </div>
-                        <button id="send-btn" class="bg-gradient-to-r from-chat-turquoise to-chat-accent hover:from-chat-turquoise-dark hover:to-chat-accent-hover text-white p-4 rounded-xl transition-all duration-300 font-medium transform hover:scale-105 hover:shadow-lg group">
-                            <i class="fas fa-paper-plane group-hover:animate-bounce-gentle"></i>
-                        </button>
+                        
+                        <!-- Quick Actions -->
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-chat-border/30">
+                            <div class="flex items-center space-x-3">
+                                <button class="text-gray-400 hover:text-chat-turquoise transition-colors duration-200 text-sm flex items-center space-x-1">
+                                    <i class="fas fa-paperclip"></i>
+                                    <span class="hidden sm:inline">Attach</span>
+                                </button>
+                                <button class="text-gray-400 hover:text-chat-accent transition-colors duration-200 text-sm flex items-center space-x-1">
+                                    <i class="fas fa-image"></i>
+                                    <span class="hidden sm:inline">Image</span>
+                                </button>
+                                <button class="text-gray-400 hover:text-purple-400 transition-colors duration-200 text-sm flex items-center space-x-1">
+                                    <i class="fas fa-code"></i>
+                                    <span class="hidden sm:inline">Code</span>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2 text-xs text-gray-500">
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse-glow"></div>
+                                    <span id="current-provider-status">OpenRouter</span>
+                                </div>
+                                <span>•</span>
+                                <span id="current-model-status">DeepSeek V3.1</span>
+                            </div>
+                        </div>
                     </div>
-                    
-
                     
                     <!-- Typing Indicator -->
                     <div id="typing-indicator" class="hidden mt-4 text-sm text-gray-400 animate-fade-in">
-                        <div class="flex items-center justify-center bg-chat-darker/50 backdrop-blur-sm rounded-lg p-3">
-                            <i class="fas fa-circle-notch fa-spin mr-3 text-chat-accent"></i>
-                            <span class="animate-pulse">AI is thinking...</span>
+                        <div class="flex items-center justify-center bg-chat-darker/80 backdrop-blur-md rounded-xl p-4 border border-chat-border/30">
+                            <i class="fas fa-circle-notch fa-spin mr-3 text-chat-accent text-lg"></i>
+                            <span class="animate-pulse font-medium">AI is thinking...</span>
                         </div>
                     </div>
                 </div>
@@ -284,7 +370,7 @@
     <footer class="bg-chat-dark/95 backdrop-blur-md border-t border-chat-border/50 py-4 text-center animate-fade-in">
         <div class="max-w-7xl mx-auto px-4">
             <p class="text-gray-400 text-sm">
-                Created by <span class="text-chat-turquoise font-semibold bg-chat-turquoise/10 px-2 py-1 rounded-full">  <a href="https://rahul04012006.pythonanywhere.com/"> Rahul-AlgoCroc</a></span> | 
+                Created by <span class="text-chat-turquoise font-semibold bg-chat-turquoise/10 px-2 py-1 rounded-full">Rahul-AlgoCroc</span> | 
                 Powered by <a href="https://puter.com" class="text-chat-accent hover:text-chat-accent-hover font-medium transition-colors duration-300 hover:underline">Puter.js</a>
             </p>
         </div>
@@ -319,6 +405,7 @@
 
 
     <!-- Scripts -->
+    <script src="js/openrouter-integration.js"></script>
     <script src="js/puter-integration.js"></script>
     <script src="js/chat-app.js"></script>
 </body>
