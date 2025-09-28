@@ -1,7 +1,3 @@
-/**
- * Main Chat Application JavaScript
- * Handles UI interactions and coordinates with Puter.js integration
- */
 
 class ChatApp {
     constructor() {
@@ -21,14 +17,26 @@ class ChatApp {
         const authStatus = document.getElementById('auth-status');
         const authBtn = document.getElementById('auth-btn');
         
-        if (puterIntegration.getAuthStatus()) {
-            authStatus.textContent = '● Authenticated';
-            authStatus.className = 'text-xs text-green-400';
-            authBtn.classList.add('hidden');
-        } else {
-            authStatus.textContent = '● Sign In Required';
-            authStatus.className = 'text-xs text-red-400';
-            authBtn.classList.remove('hidden');
+        if (puterIntegration.getCurrentProvider() === 'openrouter') {
+            if (authStatus) {
+                authStatus.textContent = 'Online';
+                authStatus.className = 'text-xs text-green-400 font-medium';
+            }
+            if (authBtn) authBtn.classList.add('hidden');
+        } else if (puterIntegration.getCurrentProvider() === 'puter') {
+            if (puterIntegration.getAuthStatus()) {
+                if (authStatus) {
+                    authStatus.textContent = 'Authenticated';
+                    authStatus.className = 'text-xs text-green-400 font-medium';
+                }
+                if (authBtn) authBtn.classList.add('hidden');
+            } else {
+                if (authStatus) {
+                    authStatus.textContent = 'Sign In Required';
+                    authStatus.className = 'text-xs text-yellow-400 font-medium';
+                }
+                if (authBtn) authBtn.classList.remove('hidden');
+            }
         }
     }
     
@@ -36,8 +44,13 @@ class ChatApp {
         this.setupEventListeners();
         this.setupFileHandling();
         this.setupModelSelector();
+        this.setupProviderSelector();
         this.setupAutoResize();
         this.setupMobileMenu();
+        this.setupCharacterCounter();
+        
+        // Initialize with OpenRouter as default
+        this.switchProvider('openrouter');
         
         // Update authentication status
         setTimeout(() => {
@@ -63,14 +76,30 @@ class ChatApp {
 
         
         // Authentication button
-        document.getElementById('auth-btn').addEventListener('click', async () => {
-            try {
-                await puterIntegration.authenticate();
-                this.updateAuthStatus();
-            } catch (error) {
-                console.error('Authentication failed:', error);
-            }
-        });
+        const authBtn = document.getElementById('auth-btn');
+        if (authBtn) {
+            authBtn.addEventListener('click', async () => {
+                try {
+                    this.showLoading('Authenticating with Puter.js...');
+                    await puterIntegration.authenticate();
+                    this.updateAuthStatus();
+                    this.addMessage({
+                        type: 'system',
+                        content: '✅ Successfully authenticated with Puter.js',
+                        timestamp: new Date().toISOString()
+                    });
+                } catch (error) {
+                    console.error('Authentication failed:', error);
+                    this.addMessage({
+                        type: 'system',
+                        content: `⚠️ Puter.js authentication failed: ${error.message}\n\n💡 **Suggestion**: Switch to OpenRouter (Free, No Signup) for immediate access to DeepSeek V3.1 and other models without authentication.`,
+                        timestamp: new Date().toISOString()
+                    });
+                } finally {
+                    this.hideLoading();
+                }
+            });
+        }
         
         // Image generation
         document.getElementById('generate-image-btn').addEventListener('click', () => {
@@ -147,18 +176,157 @@ class ChatApp {
         });
         
         // Initialize with default model
-        this.switchModel('claude-sonnet-4');
+        this.switchModel('deepseek/deepseek-chat');
+    }
+    
+    setupProviderSelector() {
+        const providerSelector = document.getElementById('provider-selector');
+        const providerSelectorSidebar = document.getElementById('provider-selector-sidebar');
+        
+        // Header provider selector
+        if (providerSelector) {
+            providerSelector.addEventListener('change', (e) => {
+                this.switchProvider(e.target.value);
+                // Sync with sidebar
+                if (providerSelectorSidebar) {
+                    providerSelectorSidebar.value = e.target.value;
+                }
+            });
+        }
+        
+        // Sidebar provider selector
+        if (providerSelectorSidebar) {
+            providerSelectorSidebar.addEventListener('change', (e) => {
+                this.switchProvider(e.target.value);
+                // Sync with header
+                if (providerSelector) {
+                    providerSelector.value = e.target.value;
+                }
+            });
+        }
+    }
+    
+    setupCharacterCounter() {
+        const messageInput = document.getElementById('message-input');
+        const charCounter = document.getElementById('char-counter');
+        
+        if (messageInput && charCounter) {
+            messageInput.addEventListener('input', () => {
+                const length = messageInput.value.length;
+                charCounter.textContent = length;
+                
+                // Change color based on length
+                if (length > 3500) {
+                    charCounter.className = 'text-red-400';
+                } else if (length > 3000) {
+                    charCounter.className = 'text-yellow-400';
+                } else {
+                    charCounter.className = 'text-gray-500';
+                }
+            });
+        }
+    }
+    
+    switchProvider(provider) {
+        puterIntegration.setCurrentProvider(provider);
+        
+        // Update UI elements
+        const openrouterModels = document.getElementById('openrouter-models');
+        const puterModels = document.getElementById('puter-models');
+        const modelSelector = document.getElementById('model-selector');
+        
+        if (provider === 'openrouter') {
+            // Show OpenRouter models, hide Puter models
+            if (openrouterModels) openrouterModels.style.display = '';
+            if (puterModels) puterModels.style.display = 'none';
+            
+            // Switch to default OpenRouter model
+            if (modelSelector) {
+                modelSelector.value = 'deepseek/deepseek-chat';
+                this.switchModel('deepseek/deepseek-chat');
+            }
+            
+            // Update status indicators
+            this.updateProviderStatus('OpenRouter', 'DeepSeek V3.1', 'Free & Ready');
+            
+        } else if (provider === 'puter') {
+            // Show Puter models, hide OpenRouter models
+            if (openrouterModels) openrouterModels.style.display = 'none';
+            if (puterModels) puterModels.style.display = '';
+            
+            // Switch to default Puter model
+            if (modelSelector) {
+                modelSelector.value = 'claude-sonnet-4';
+                this.switchModel('claude-sonnet-4');
+            }
+            
+            // Update status indicators
+            this.updateProviderStatus('Puter.js', 'Claude Sonnet 4', 'Login Required');
+        }
+        
+        // Add system message about provider switch
+        this.addMessage({
+            type: 'system',
+            content: `🔄 Switched to ${provider === 'openrouter' ? 'OpenRouter (Free, No Signup Required)' : 'Puter.js (Login Required)'}`,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Update authentication status
+        this.updateAuthStatus();
+    }
+    
+    updateProviderStatus(provider, model, status) {
+        // Update header status
+        const currentModelHeader = document.getElementById('current-model-header');
+        if (currentModelHeader) {
+            currentModelHeader.textContent = model;
+        }
+        
+        // Update input area status
+        const currentProviderStatus = document.getElementById('current-provider-status');
+        const currentModelStatus = document.getElementById('current-model-status');
+        
+        if (currentProviderStatus) {
+            currentProviderStatus.textContent = provider;
+        }
+        if (currentModelStatus) {
+            currentModelStatus.textContent = model;
+        }
+        
+        // Update sidebar status
+        const modelStatus = document.getElementById('model-status');
+        if (modelStatus) {
+            const isReady = status.includes('Ready');
+            modelStatus.innerHTML = `
+                <div class="w-2 h-2 ${isReady ? 'bg-green-400' : 'bg-yellow-400'} rounded-full mr-1 animate-pulse-glow"></div>
+                ${status}
+            `;
+            modelStatus.className = `${isReady ? 'text-green-400' : 'text-yellow-400'} font-medium flex items-center`;
+        }
     }
     
     switchModel(modelName) {
         puterIntegration.setCurrentModel(modelName);
         
+        // Also update OpenRouter if it's the current provider
+        if (puterIntegration.getCurrentProvider() === 'openrouter' && openRouterIntegration) {
+            openRouterIntegration.setCurrentModel(modelName);
+        }
+        
         const config = puterIntegration.getModelConfig(modelName);
         
         // Update UI
-        document.getElementById('current-model').textContent = this.getModelDisplayName(modelName);
-        document.getElementById('model-provider').textContent = config.provider;
-        document.getElementById('model-capabilities').textContent = config.capabilities;
+        const currentModelEl = document.getElementById('current-model');
+        const modelProviderEl = document.getElementById('model-provider');
+        const modelCapabilitiesEl = document.getElementById('model-capabilities');
+        
+        if (currentModelEl) currentModelEl.textContent = this.getModelDisplayName(modelName);
+        if (modelProviderEl) modelProviderEl.textContent = config.provider;
+        if (modelCapabilitiesEl) modelCapabilitiesEl.textContent = config.capabilities;
+        
+        // Update header and status
+        this.updateProviderStatus(config.provider, this.getModelDisplayName(modelName), 
+            puterIntegration.getCurrentProvider() === 'openrouter' ? 'Free & Ready' : 'Login Required');
         
         // Add system message about model switch
         this.addMessage({
@@ -170,13 +338,20 @@ class ChatApp {
     
     getModelDisplayName(modelName) {
         const displayNames = {
+            // Puter.js models
             'gpt-4o': 'GPT-4o',
             'gpt-4.1': 'GPT-4.1',
             'o1': 'o1',
             'o3-mini': 'o3-mini',
             'claude-sonnet-4': 'Claude Sonnet 4',
             'deepseek-chat': 'DeepSeek Chat V3',
-            'deepseek-reasoner': 'DeepSeek Reasoner R1'
+            'deepseek-reasoner': 'DeepSeek Reasoner R1',
+            
+            // OpenRouter models
+            'deepseek/deepseek-chat': 'DeepSeek V3.1',
+            'deepseek/deepseek-reasoner': 'DeepSeek R1',
+            'google/gemini-flash-1.5': 'Gemini Flash 1.5',
+            'meta-llama/llama-3.1-8b-instruct:free': 'Llama 3.1 8B'
         };
         
         return displayNames[modelName] || modelName;
@@ -431,7 +606,7 @@ You can also visit https://puter.com to create a free account first, then refres
             headerDiv.className = 'flex items-center space-x-2 mb-2';
             
             const icon = message.type === 'ai' ? 'fa-robot' : 'fa-info-circle';
-            const color = message.type === 'ai' ? 'text-chat-turquoise' : 'text-yellow-400';
+            const color = message.type === 'ai' ? 'text-chat-turquoise' : 'text-gray-400';
             
             headerDiv.innerHTML = `
                 <i class="fas ${icon} ${color}"></i>
@@ -467,7 +642,7 @@ You can also visit https://puter.com to create a free account first, then refres
             case 'ai':
                 return 'bg-chat-light text-white border border-chat-border';
             case 'system':
-                return 'bg-green-900 text-green-100 border border-green-700';
+                return 'bg-chat-darker/80 text-gray-300 border border-chat-border/50';
             case 'error':
                 return 'bg-red-900 text-red-100 border border-red-700';
             default:
