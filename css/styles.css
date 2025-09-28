@@ -230,9 +230,8 @@ code.inline-code {
         height: 100vh;
         z-index: 50;
         transition: left 0.3s ease;
-        width: 85vw;
-        max-width: 320px;
-        overflow-y: auto;
+        width: 320px;
+        max-width: 90vw;
     }
     
     #sidebar.sidebar-open {
@@ -242,8 +241,7 @@ code.inline-code {
     .sidebar-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 40;
         opacity: 0;
         pointer-events: none;
@@ -255,66 +253,44 @@ code.inline-code {
         pointer-events: auto;
     }
     
-    /* Mobile Chat Input */
-    .chat-input-mobile {
-        bottom: 1rem !important;
-        left: 1rem !important;
-        right: 1rem !important;
-    }
-    
-    /* Mobile Header */
-    header {
-        padding: 0.75rem 1rem;
-    }
-    
-    /* Mobile Welcome Message */
-    .welcome-message {
-        padding: 2rem 1rem;
-        text-align: center;
-    }
-    
-    .welcome-message h1 {
-        font-size: 1.75rem;
-    }
-    
-    .welcome-message p {
-        font-size: 0.875rem;
-    }
-    
-    /* Mobile Feature Cards */
-    .feature-cards {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 0 1rem;
-    }
-    
-    /* Mobile Chat Container */
+    /* Adjust chat container for mobile */
     #chat-container {
-        padding-bottom: 250px;
+        padding-bottom: 140px !important;
     }
     
-    /* Mobile Message Styling */
-    .message-content {
-        font-size: 14px;
-        line-height: 1.5;
+    /* Make input area more compact on mobile */
+    .chat-input-container {
+        padding: 12px !important;
     }
     
-    /* Mobile Code Blocks */
-    .code-block-container pre {
-        font-size: 12px;
-        padding: 12px;
-    }
-    
-    /* Mobile Input Styling */
+    /* Improve text input on mobile */
     #message-input {
-        font-size: 16px; /* Prevents zoom on iOS */
-        min-height: 48px;
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        padding: 12px 16px !important;
     }
     
-    /* Mobile Button Sizing */
+    /* Better button sizing on mobile */
     #send-btn {
+        padding: 12px !important;
         min-width: 48px;
         min-height: 48px;
+    }
+    
+    /* Responsive welcome grid */
+    .welcome-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+    }
+    
+    /* Compact model info on mobile */
+    .model-info {
+        padding: 12px !important;
+        font-size: 11px !important;
+    }
+    
+    /* Better file upload on mobile */
+    #file-drop-zone {
+        padding: 16px !important;
     }
 }
 
@@ -431,7 +407,26 @@ footer {
 /* Chat Container Styling */
 #chat-container {
     background: linear-gradient(180deg, #0a0a15 0%, #0f0f23 100%);
-    padding-bottom: 200px;
+    padding-bottom: 90px; /* Reduced from default to move input higher */
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    #chat-container {
+        padding-bottom: 80px !important;
+    }
+    
+    .chat-input-container {
+        padding: 8px !important;
+    }
+    
+    #message-input {
+        padding: 8px 12px !important;
+    }
+    
+    #send-btn {
+        padding: 8px !important;
+    }
 }
 
 /* Image Modal Enhancement */
@@ -485,6 +480,64 @@ footer {
     box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
 }
 
+/* Improved Dark Theme for Messages */
+.message-dark {
+    background: #1a1a2e;
+    border: 1px solid #2d2d44;
+    color: #e6edf3;
+}
+
+/* Better contrast for system messages */
+.system-message {
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    border: 1px solid #4a4a6a;
+    color: #b8c5d1;
+}
+
+/* Error message styling */
+.error-message {
+    background: linear-gradient(135deg, #2a1f1f 0%, #1a1a1a 100%);
+    border: 1px solid #4a3333;
+    color: #d1b8b8;
+}
+
+/* Responsive typography */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.25rem !important;
+    }
+    
+    h2 {
+        font-size: 1.125rem !important;
+    }
+    
+    .text-lg {
+        font-size: 1rem !important;
+    }
+    
+    .text-3xl {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Compact padding for small screens */
+    .p-6 {
+        padding: 1rem !important;
+    }
+    
+    .p-4 {
+        padding: 0.75rem !important;
+    }
+    
+    /* Better spacing */
+    .space-y-4 > * + * {
+        margin-top: 0.75rem !important;
+    }
+    
+    .mb-4 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
 /* Chat Input Enhancement */
 #message-input {
     transition: all 0.2s ease;
@@ -493,6 +546,57 @@ footer {
 #message-input:focus {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(32, 178, 170, 0.2);
+}
+
+/* Chat Input Positioning - Move Higher */
+.chat-input-container {
+    bottom: 0;
+    padding: 16px;
+}
+
+/* Reduce chat container bottom padding */
+#chat-container {
+    padding-bottom: 100px !important;
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+    button, select, input, textarea {
+        min-height: 44px;
+    }
+    
+    /* Improve touch scrolling */
+    #chat-container {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better text sizing for mobile */
+    .text-content {
+        font-size: 16px;
+        line-height: 1.5;
+    }
+    
+    /* Responsive code blocks */
+    .code-block-container {
+        margin: 12px 0;
+        font-size: 13px;
+    }
+    
+    .code-block-container pre {
+        padding: 12px;
+        font-size: 13px;
+    }
+    
+    /* Better message spacing on mobile */
+    .message-enter {
+        margin-bottom: 16px;
+    }
+    
+    /* Compact stats on mobile */
+    .stat-item {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
 }
 
 /* Model Selector Enhancement */
@@ -522,4 +626,58 @@ footer {
 .stat-number:hover {
     color: #20b2aa;
     transform: scale(1.1);
+}
+
+/* Improved accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .bg-chat-dark {
+        background: #000000 !important;
+    }
+    
+    .text-gray-400 {
+        color: #ffffff !important;
+    }
+    
+    .border-chat-border {
+        border-color: #ffffff !important;
+    }
+}
+
+/* Dark mode improvements */
+@media (prefers-color-scheme: dark) {
+    /* Already optimized for dark mode */
+}
+
+/* Better focus indicators */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #20b2aa;
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Better selection colors */
+::selection {
+    background: rgba(32, 178, 170, 0.4);
+    color: white;
+}
+
+::-moz-selection {
+    background: rgba(32, 178, 170, 0.4);
+    color: white;
 }
