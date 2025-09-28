@@ -1,13 +1,11 @@
 
 class PuterIntegration {
     constructor() {
-        this.currentModel = 'deepseek/deepseek-chat';
-        this.currentProvider = 'openrouter'; // Default to OpenRouter
+        this.currentModel = 'claude-sonnet-4';
         this.uploadedFiles = [];
         this.lastResponse = '';
         this.isAuthenticated = false;
         this.streamingResponse = null;
-        this.fallbackEnabled = true;
         
         // Model configurations
         this.modelConfigs = {
@@ -59,34 +57,32 @@ class PuterIntegration {
     }
     
     async init() {
-        // Wait a bit for Puter.js to load
-        setTimeout(async () => {
-            try {
-                // Initialize Puter.js with authentication
-                if (typeof puter !== 'undefined' && puter.auth) {
-                    // Check if already authenticated
+        try {
+            // Initialize Puter.js with authentication
+            if (typeof puter !== 'undefined') {
+                // Check if already authenticated
+                try {
+                    await puter.auth.getUser();
+                    this.isAuthenticated = true;
+                    console.log('✅ Puter.js initialized and authenticated');
+                } catch (authError) {
+                    // Try to authenticate
                     try {
-                        const user = await puter.auth.getUser();
-                        if (user && user.username) {
-                            this.isAuthenticated = true;
-                            console.log('✅ Puter.js initialized and authenticated as:', user.username);
-                        } else {
-                            this.isAuthenticated = false;
-                            console.log('⚠️ Puter.js not authenticated - sign in required');
-                        }
-                    } catch (authError) {
+                        await puter.auth.signIn();
+                        this.isAuthenticated = true;
+                        console.log('✅ Puter.js authenticated successfully');
+                    } catch (signInError) {
+                        console.log('⚠️ Puter.js authentication required - please sign in when prompted');
                         this.isAuthenticated = false;
-                        console.log('⚠️ Puter.js authentication check failed - this is normal if not signed in');
                     }
-                } else {
-                    console.log('⚠️ Puter.js not fully loaded - using OpenRouter as default');
-                    this.isAuthenticated = false;
                 }
-            } catch (error) {
-                console.log('⚠️ Puter.js initialization had issues - using OpenRouter as default');
-                this.isAuthenticated = false;
+            } else {
+                throw new Error('Puter.js not loaded');
             }
-        }, 1000);
+        } catch (error) {
+            console.error('❌ Puter.js initialization error:', error);
+            this.isAuthenticated = false;
+        }
     }
     
     setCurrentModel(model) {
@@ -94,30 +90,7 @@ class PuterIntegration {
         console.log(`🤖 Switched to model: ${model}`);
     }
     
-    setCurrentProvider(provider) {
-        this.currentProvider = provider;
-        console.log(`🔄 Switched to provider: ${provider}`);
-    }
-    
-    getCurrentProvider() {
-        return this.currentProvider;
-    }
-    
     getModelConfig(model) {
-        // Check OpenRouter models first
-        if (this.currentProvider === 'openrouter' && openRouterIntegration) {
-            const openRouterConfig = openRouterIntegration.getModelConfig(model);
-            if (openRouterConfig) {
-                return {
-                    provider: openRouterConfig.provider,
-                    capabilities: openRouterConfig.capabilities,
-                    multimodal: false,
-                    streaming: openRouterConfig.streaming
-                };
-            }
-        }
-        
-        // Fallback to Puter.js models
         return this.modelConfigs[model] || {
             provider: 'Unknown',
             capabilities: 'General',
@@ -132,35 +105,14 @@ class PuterIntegration {
     
     async authenticate() {
         try {
-            if (typeof puter === 'undefined') {
-                throw new Error('Puter.js is not loaded. Please refresh the page.');
-            }
-            
-            console.log('🔐 Starting Puter.js authentication...');
-            const result = await puter.auth.signIn();
-            
-            if (result) {
-                this.isAuthenticated = true;
-                console.log('✅ Authentication successful');
-                return true;
-            } else {
-                throw new Error('Authentication returned no result');
-            }
+            await puter.auth.signIn();
+            this.isAuthenticated = true;
+            console.log('✅ Authentication successful');
+            return true;
         } catch (error) {
             console.error('❌ Authentication failed:', error);
             this.isAuthenticated = false;
-            
-            // Handle specific error types
-            let errorMessage = 'Authentication failed';
-            if (error.error === 'auth_window_closed') {
-                errorMessage = 'Authentication window was closed. Please try again.';
-            } else if (error.message) {
-                errorMessage = error.message;
-            } else if (typeof error === 'string') {
-                errorMessage = error;
-            }
-            
-            throw new Error(errorMessage);
+            throw error;
         }
     }
     
@@ -170,27 +122,12 @@ class PuterIntegration {
     
     async sendMessage(message, attachments = [], chatHistory = []) {
         try {
-            // Route to appropriate provider
-            if (this.currentProvider === 'openrouter') {
-                console.log('🚀 Using OpenRouter API');
-                return await openRouterIntegration.sendMessage(message, chatHistory);
-            }
-            
-            // Puter.js flow
-            console.log('🔐 Using Puter.js API');
-            
             // Check authentication first
             if (!this.isAuthenticated) {
                 try {
                     await puter.auth.signIn();
                     this.isAuthenticated = true;
                 } catch (authError) {
-                    // Fallback to OpenRouter if authentication fails
-                    if (this.fallbackEnabled) {
-                        console.log('⚠️ Puter.js auth failed, falling back to OpenRouter');
-                        this.currentProvider = 'openrouter';
-                        return await openRouterIntegration.sendMessage(message, chatHistory);
-                    }
                     throw new Error('Please sign in to Puter.js to use AI models. A popup should appear for authentication.');
                 }
             }
@@ -271,24 +208,11 @@ class PuterIntegration {
         } catch (error) {
             console.error('❌ Send message error:', error);
             
-            // Handle specific Puter.js errors and fallback
+            // Handle specific Puter.js errors
             if (error.error && error.error.code === 'error_400_from_delegate') {
                 if (error.error.message.includes('Permission denied') || error.error.message.includes('usage-limited-chat')) {
-                    // Fallback to OpenRouter if Puter.js has usage limits
-                    if (this.fallbackEnabled && this.currentProvider === 'puter') {
-                        console.log('⚠️ Puter.js usage limit reached, falling back to OpenRouter');
-                        this.currentProvider = 'openrouter';
-                        return await openRouterIntegration.sendMessage(message, chatHistory);
-                    }
-                    throw new Error('Usage limit reached. Switched to OpenRouter for unlimited free access.');
+                    throw new Error('Usage limit reached or permission denied. The free tier of Puter.js may have limitations. Please try again later or consider upgrading your Puter.js account.');
                 }
-            }
-            
-            // General fallback for any Puter.js errors
-            if (this.fallbackEnabled && this.currentProvider === 'puter') {
-                console.log('⚠️ Puter.js error, falling back to OpenRouter');
-                this.currentProvider = 'openrouter';
-                return await openRouterIntegration.sendMessage(message, chatHistory);
             }
             
             throw new Error(`Failed to send message: ${error.message || 'Unknown error'}`);
