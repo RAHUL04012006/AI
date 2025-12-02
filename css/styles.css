@@ -1,0 +1,746 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #ffffff;
+    /* Subtle professional gradient: mostly white with a hint of pink at the bottom/corners */
+    background: radial-gradient(circle at top right, #fff1f2, #ffffff 40%, #ffffff 100%);
+    color: #1e293b;
+    /* Slate-800 for professional text color */
+}
+
+/* Remove the intense animation for a more stable, professional feel */
+/* @keyframes gradientShift was removed */
+
+.main-container {
+    flex: 1;
+    display: flex;
+}
+
+/* Ensure footer stays at bottom */
+footer {
+    margin-top: auto;
+}
+
+/* Scrollbar Styling - Professional */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    /* Slate-300 */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+    /* Slate-400 */
+}
+
+/* Message Animation */
+.message-enter {
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Drag and Drop Animation */
+.drag-over {
+    background: rgba(236, 72, 153, 0.1) !important;
+    border-color: #ec4899 !important;
+    transform: scale(1.02);
+}
+
+/* File Preview Styles */
+.file-preview {
+    transition: all 0.2s ease;
+}
+
+.file-preview:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Text Content Styling */
+.text-content {
+    color: #000000;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.text-content p {
+    margin-bottom: 12px;
+}
+
+/* Code Block Styling - ChatGPT Style */
+.code-block-container {
+    margin: 16px 0;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #fbcfe8;
+    box-shadow: 0 4px 6px rgba(236, 72, 153, 0.05);
+    position: relative;
+}
+
+.code-block-container pre {
+    background: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0;
+    overflow-x: auto;
+    position: relative;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.code-block-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+    border-bottom: 1px solid #fbcfe8;
+    border-radius: 6px 6px 0 0;
+}
+
+.code-block-container::after {
+    content: "Code";
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    color: #db2777;
+    font-size: 12px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.code-block-container pre code {
+    background: transparent;
+    padding: 40px 0 0 0;
+    border-radius: 0;
+    color: #000000;
+    font-size: 14px;
+    line-height: 1.5;
+    display: block;
+    position: relative;
+    z-index: 2;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+/* Inline Code Styling */
+code.inline-code {
+    background: #fdf2f8;
+    color: #db2777;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+    font-size: 13px;
+    border: 1px solid #fbcfe8;
+}
+
+/* Legacy support for old message format */
+.message pre {
+    background: #0d1117;
+    border: 2px solid #30363d;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    position: relative;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.message pre code {
+    background: transparent;
+    color: #e6edf3;
+    padding: 0;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+    font-size: 14px;
+}
+
+/* Copy button for code blocks */
+.code-block-container {
+    position: relative;
+}
+
+/* Copy Code Button - Always Visible */
+.copy-code-btn {
+    background-color: #ec4899 !important;
+    color: white !important;
+    border: 2px solid #ec4899 !important;
+    padding: 0.375rem 0.75rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: absolute;
+    /* Keep position absolute for placement */
+    top: 12px;
+    /* Keep original top/right for placement */
+    right: 16px;
+    z-index: 3;
+    /* Keep original z-index */
+}
+
+.copy-code-btn:hover {
+    background-color: #db2777 !important;
+    border-color: #db2777 !important;
+    transform: scale(1.05) !important;
+}
+
+.copy-code-btn i {
+    color: white !important;
+}
+
+/* Image Generation Grid */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.generated-image {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.generated-image:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile Responsive Sidebar */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        z-index: 50;
+        transition: left 0.3s ease;
+        width: 320px;
+        max-width: 90vw;
+    }
+
+    #sidebar.sidebar-open {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Adjust chat container for mobile */
+    #chat-container {
+        padding-bottom: 140px !important;
+    }
+
+    /* Make input area more compact on mobile */
+    .chat-input-container {
+        padding: 12px !important;
+    }
+
+    /* Improve text input on mobile */
+    #message-input {
+        font-size: 16px !important;
+        /* Prevents zoom on iOS */
+        padding: 12px 16px !important;
+    }
+
+    /* Better button sizing on mobile */
+    #send-btn {
+        padding: 12px !important;
+        min-width: 48px;
+        min-height: 48px;
+    }
+
+    /* Responsive welcome grid */
+    .welcome-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Compact model info on mobile */
+    .model-info {
+        padding: 12px !important;
+        font-size: 11px !important;
+    }
+
+    /* Better file upload on mobile */
+    #file-drop-zone {
+        padding: 16px !important;
+    }
+}
+
+/* Loading States */
+.loading-dots {
+    display: inline-block;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+
+    0%,
+    20% {
+        content: '';
+    }
+
+    40% {
+        content: '.';
+    }
+
+    60% {
+        content: '..';
+    }
+
+    80%,
+    100% {
+        content: '...';
+    }
+}
+
+/* Button Hover Effects */
+button {
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+/* File Upload Enhancements */
+.file-item {
+    background: rgba(236, 72, 153, 0.05);
+    border: 1px solid rgba(236, 72, 153, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    background: rgba(236, 72, 153, 0.1);
+    transform: translateX(4px);
+}
+
+/* Gradient Animation */
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Text Selection */
+::selection {
+    background: rgba(236, 72, 153, 0.2);
+    color: inherit;
+}
+
+::-moz-selection {
+    background: rgba(236, 72, 153, 0.2);
+    color: inherit;
+}
+
+/* Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
+}
+
+/* Disabled States */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:disabled::before {
+    display: none;
+}
+
+/* Header Gradient */
+header {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Footer Styling */
+footer {
+    background: #ffffff;
+}
+
+/* Chat Container Styling */
+#chat-container {
+    background: #ffffff;
+    padding-bottom: 90px;
+    /* Reduced from default to move input higher */
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    #chat-container {
+        padding-bottom: 80px !important;
+    }
+
+    .chat-input-container {
+        padding: 8px !important;
+    }
+
+    #message-input {
+        padding: 8px 12px !important;
+    }
+
+    #send-btn {
+        padding: 8px !important;
+    }
+}
+
+/* Image Modal Enhancement */
+.image-modal {
+    backdrop-filter: blur(10px);
+}
+
+/* Welcome Section Enhancement */
+.welcome-feature {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.welcome-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(236, 72, 153, 0.15);
+}
+
+/* Message Styling Improvements */
+.message-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 8px 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.message-content img:hover {
+    transform: scale(1.02);
+}
+
+/* Typing Indicator Animation */
+#typing-indicator i {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Enhanced Button Styles */
+.btn-gradient {
+    background: linear-gradient(to right, #f472b6, #ec4899);
+    color: #ffffff !important;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #e879f9 0%, #db2777 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+}
+
+.message-user {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+}
+
+.message-user * {
+    color: #ffffff !important;
+}
+
+/* Improved Dark Theme for Messages */
+.message-dark {
+    background: #ffffff;
+    border: 1px solid #fbcfe8;
+    color: #000000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Better contrast for system messages */
+.system-message {
+    .system-message {
+        background: #fdf2f8;
+        border: 1px solid #fbcfe8;
+        color: #831843;
+    }
+
+    /* Error message styling */
+    .error-message {
+        background: linear-gradient(135deg, #2a1f1f 0%, #1a1a1a 100%);
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+    }
+
+    /* Responsive typography */
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 1.25rem !important;
+        }
+
+        h2 {
+            font-size: 1.125rem !important;
+        }
+
+        .text-lg {
+            font-size: 1rem !important;
+        }
+
+        .text-3xl {
+            font-size: 1.5rem !important;
+        }
+
+        /* Compact padding for small screens */
+        .p-6 {
+            padding: 1rem !important;
+        }
+
+        .p-4 {
+            padding: 0.75rem !important;
+        }
+
+        /* Better spacing */
+        .space-y-4>*+* {
+            margin-top: 0.75rem !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 0.75rem !important;
+        }
+    }
+
+    /* Chat Input Enhancement */
+    #message-input {
+        transition: all 0.2s ease;
+    }
+
+    #message-input:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+    }
+
+    /* Chat Input Positioning - Move Higher */
+    .chat-input-container {
+        bottom: 0;
+        padding: 16px;
+    }
+
+    /* Reduce chat container bottom padding */
+    #chat-container {
+        padding-bottom: 100px !important;
+    }
+
+    /* Better mobile touch targets */
+    @media (max-width: 768px) {
+
+        button,
+        select,
+        input,
+        textarea {
+            min-height: 44px;
+        }
+
+        /* Improve touch scrolling */
+        #chat-container {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Better text sizing for mobile */
+        .text-content {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Responsive code blocks */
+        .code-block-container {
+            margin: 12px 0;
+            font-size: 13px;
+        }
+
+        .code-block-container pre {
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        /* Better message spacing on mobile */
+        .message-enter {
+            margin-bottom: 16px;
+        }
+
+        /* Compact stats on mobile */
+        .stat-item {
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+        }
+    }
+
+    /* Model Selector Enhancement */
+    #model-selector {
+        transition: all 0.2s ease;
+    }
+
+    #model-selector:focus {
+        transform: translateY(-1px);
+    }
+
+    /* File Drop Zone Animation */
+    #file-drop-zone {
+        transition: all 0.3s ease;
+    }
+
+    #file-drop-zone:hover {
+        background: rgba(236, 72, 153, 0.05);
+        border-color: #ec4899;
+    }
+
+    /* Stats Counter Animation */
+    .stat-number {
+        transition: all 0.3s ease;
+    }
+
+    .stat-number:hover {
+        color: #ec4899;
+        transform: scale(1.1);
+    }
+
+    /* Improved accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        .bg-chat-dark {
+            background: #ffffff !important;
+        }
+
+        .text-gray-400 {
+            color: #000000 !important;
+        }
+
+        .border-chat-border {
+
+            /* Better focus indicators */
+            button:focus-visible,
+            input:focus-visible,
+            textarea:focus-visible,
+            select:focus-visible {
+                outline: 2px solid #ec4899;
+                outline-offset: 2px;
+            }
+
+            /* Smooth scrolling */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Better selection colors */
+            ::selection {
+                background: rgba(236, 72, 153, 0.2);
+                color: inherit;
+            }
+
+            ::-moz-selection {
+                background: rgba(236, 72, 153, 0.2);
+                color: inherit;
+            }
+        }
+    }
+}
