@@ -8,6 +8,9 @@ Welcome to **AlgoCroc AI** — a web application that enables you to chat with A
 
 <img width="1919" height="882" alt="image" src="https://github.com/user-attachments/assets/addf8a2e-41c6-4df2-a4e9-561d72209ac2" />
 
+
+
+
 ## Unlimited Image Generation
 <img width="1919" height="942" alt="image" src="https://github.com/user-attachments/assets/9615b612-be47-430c-b2ad-7b21fd90eb6b" />
 
