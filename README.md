@@ -1,7 +1,5 @@
 # AlgoCroc AI
 
-![AlgoCroc Logo](./AlgoCroc.png)
-
 Welcome to **AlgoCroc AI** — a web application that enables you to chat with AI models for free. Designed for seamless access to free AI functionalities, this project brings together interactive chat capabilities and image generation inside a single interface, without the need for API keys for basic models.
 
 ## Demo
